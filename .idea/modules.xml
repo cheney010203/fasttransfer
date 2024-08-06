@@ -2,11 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/KuaiChuan.iml" filepath="$PROJECT_DIR$/KuaiChuan.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/KuaiChuan.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/KuaiChuan.app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/KuaiChuan.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/KuaiChuan.app.androidTest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/KuaiChuan.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/KuaiChuan.app.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/KuaiChuan.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/KuaiChuan.app.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/fasttransfer.iml" filepath="$PROJECT_DIR$/.idea/modules/fasttransfer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/fasttransfer.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/fasttransfer.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/fasttransfer.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/fasttransfer.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/fasttransfer.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/fasttransfer.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/fasttransfer.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/fasttransfer.app.unitTest.iml" />
     </modules>
   </component>
 </project>

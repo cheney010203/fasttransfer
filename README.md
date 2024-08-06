@@ -1,79 +1,89 @@
-# KuaiChuan(仿茄子快传)
-[English](https://github.com/mayubao/KuaiChuan/blob/master/README_EN.md)
+# NettyDemo
 
-仿茄子快传的一款文件传输应用， 涉及到Socket通信，包括TCP，UDP通信。（喜欢的给一个star, 有帮助的给一个fork， 欢迎Star和Fork ^_^）
+ > Netty是基于Java NIO client-server的网络应用框架，使用Netty可以快速开发网络应用
+ 
+   >更多用法请请跳转到[https://github.com/netty/netty](https://github.com/netty/netty)  
+ 
+ **本项目基于Netty在Android平台所建项目，只是提供Netty的使用方式，大家可根据自己的需求，做相应的定制。**
+ 
+ **演示时，客户端在Const.java中请修改TCP服务端ip地址就行了，服务端通过切换通道，可以与多个客户端通信。**
+ 
+ 最后，不足之处请海涵，多多提issue，大家一起解决。
+ ## 如何导入
+ 
+```
+ dependencies {
+  implementation 'com.littlegreens.netty.client:nettyclientlib:1.0.5'
+ } 
+```
+ ## 一、先看演示效果，后面有详细的用法教程
+ <img src="https://github.com/cai784921129/NettyDemo/blob/master/screenshot/clent.gif" width="280px"/> <img src="https://github.com/cai784921129/NettyDemo/blob/master/screenshot/server.gif" height="280px"/>
 
-[下载](http://fir.im/6ntz) 点击下载去下载应用。
+如果是作为TCP客户端使用的话，可以直接依赖
 
-## 效果预览
+## 二、HOW TO USE?
 
-### 主页 ###
-![Alt text](https://github.com/mayubao/KuaiChuan/blob/master/ScreenShot/home.gif)
-### 文件发送端 ###
-![Alt text](https://github.com/mayubao/KuaiChuan/blob/master/ScreenShot/fs_1.gif)
-![Alt text](https://github.com/mayubao/KuaiChuan/blob/master/ScreenShot/fs_2.gif)
-![Alt text](https://github.com/mayubao/KuaiChuan/blob/master/ScreenShot/fs_3.gif)
-### 文件接收端 ###
-![Alt text](https://github.com/mayubao/KuaiChuan/blob/master/ScreenShot/fr_1.gif)
-![Alt text](https://github.com/mayubao/KuaiChuan/blob/master/ScreenShot/fr_2.gif)
+1. **创建TCP客户端**
+```Java
+      NettyTcpClient  mNettyTcpClient = new NettyTcpClient.Builder()
+                .setHost(Const.HOST)    //设置服务端地址
+                .setTcpPort(Const.TCP_PORT) //设置服务端端口号
+                .setMaxReconnectTimes(5)    //设置最大重连次数
+                .setReconnectIntervalTime(5)    //设置重连间隔时间。单位：秒
+                .setSendheartBeat(true) //设置是否发送心跳
+                .setHeartBeatInterval(5)    //设置心跳间隔时间。单位：秒
+                .setHeartBeatData("I'm is HeartBeatData") //设置心跳数据，可以是String类型，也可以是byte[]，以后设置的为准
+                .setIndex(0)    //设置客户端标识.(因为可能存在多个tcp连接)
+//                .setPacketSeparator("#")//用特殊字符，作为分隔符，解决粘包问题，默认是用换行符作为分隔符
+//                .setMaxPacketLong(1024)//设置一次发送数据的最大长度，默认是1024
+                .build();
+```
 
-### 网页传(20161218新增) ###
-![Alt text](https://github.com/mayubao/KuaiChuan/blob/master/ScreenShot/w_1.gif)
+2. **设置监听**
+```Java
+        mNettyTcpClient.setListener(new NettyClientListener<String>() {
+            @Override
+            public void onMessageResponseClient(String msg, int index) {
+                //服务端过来的消息回调
+            }
 
-![Alt text](https://github.com/mayubao/KuaiChuan/blob/master/ScreenShot/w_2.jpg)
-![Alt text](https://github.com/mayubao/KuaiChuan/blob/master/ScreenShot/w_3.jpg)
+            @Override
+            public void onClientStatusConnectChanged(int statusCode, int index) {
+               //连接状态回调
+            }
+        });
+```
+3. **连接、断开连接**
+- 判断是否已经连接
+```Java
+mNettyTcpClient.getConnectStatus()
+```
+- 连接
+```Java
+mNettyTcpClient.connect();
+```
+- 断开连接
+```Java
+mNettyTcpClient.disconnect();
+```
+4. **发送信息到服务端**
+```Java
+                    mNettyTcpClient.sendMsgToServer(msg, new MessageStateListener() {
+                        @Override
+                        public void isSendSuccss(boolean isSuccess) {
+                            if (isSuccess) {
+                                Log.d(TAG, "send successful");
+                            } else {
+                                Log.d(TAG, "send error");
+                            }
+                        }
+                    });
+```
 
-## 原理
+## 二、小伙伴遇到的问题
+1、服务端反馈的消息被截断
+答：由于socket会粘包，sdk中默认的采用的是特殊符号作为分割符，来解决粘包问题，默认采用的分隔符是分割符，也可以通过setPacketSeparator，设置自定义的换行符，这样客户端发送信息的时候，sdk会在末尾，添加分隔符，这里需要注意服务端，返回信息的时候，也要添加对应的分隔符。
 
-
-快传有两种方式可以传输文件：
-
-1. Android应用端发送到Android应用端（必须安装应用）
-2. 通过Web浏览器来实现文件的传送 （不必安装应用）
-
-第一种方式主要是是通过设备间发送文件。 文件传输在文件发送端或者是文件接收端通过自定义协议的Socket通信来实现。由于文件接收方和文件发送方都要有文件的缩略图，这里采用了header + body的自定义协议, header部分包括了文件的信息（长度，大小，缩略图）， body部分就是文件。
-
-第二种方式主要是在android应用端架设微型Http服务器来实现文件的传输。这里可以用ftp来实现，为什么不用ftp呢？因为没有缩略图，这是重点！
-
-
-## 测试
-
-（必须在真机下测试）
-在Android测试机 分别是 魅蓝2 与  华为 SCL-TL00， Vivo xs1 运行正常
-
-## 感谢
-
-google: <http://www.google.com>
-
-stackoverflow  <http://stackoverflow.com/>
-
-
-## 版本
-
-### v1.0 ###
-完成了Android端到Android端的文件传输
-
-### v1.1 ###
-完成了网页传模块的功能
-
-
-## issue
-QQ:345269374
-
-Email:345269374@qq.com
+2、master分支代码，不支持发送byte[]格式，byte[]格式的需求，请参考develop_2.0 分支
 
 
-## License
-    Copyright 2016 mayubao
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
