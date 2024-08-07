@@ -22,6 +22,7 @@ import ifreecomm.nettyserver.adapter.CustomSpinnerAdapter;
 import ifreecomm.nettyserver.adapter.LogAdapter;
 import ifreecomm.nettyserver.bean.ClientChanel;
 import ifreecomm.nettyserver.bean.LogBean;
+import ifreecomm.nettyserver.netty.FileUploadServer;
 import ifreecomm.nettyserver.netty.NettyServerListener;
 import ifreecomm.nettyserver.netty.NettyTcpServer;
 import io.netty.channel.Channel;
@@ -111,8 +112,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.startServer:
 
-                startServer();
+//                startServer();
 
+                //TODO: receive file , by xujia
+                FileUploadServer.receiverFile();
                 break;
 
             case R.id.send_btn:

@@ -4,11 +4,14 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.geely.netty.nettycore.Const;
+import com.geely.netty.nettycore.FileUploadFile;
 import com.littlegreens.netty.client.handler.NettyClientHandler;
 import com.littlegreens.netty.client.listener.MessageStateListener;
 import com.littlegreens.netty.client.listener.NettyClientListener;
 import com.littlegreens.netty.client.status.ConnectState;
 
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import io.netty.bootstrap.Bootstrap;
@@ -25,6 +28,9 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
@@ -287,6 +293,40 @@ public class NettyTcpClient {
             });
         }
         return flag;
+    }
+
+    private void connect(int port, String host, final FileUploadFile fileUploadFile) throws Exception {
+        EventLoopGroup group = new NioEventLoopGroup();
+        try {
+            Bootstrap b = new Bootstrap();
+            b.group(group).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, true).handler(new ChannelInitializer<Channel>() {
+
+                @Override
+                protected void initChannel(Channel ch) throws Exception {
+                    ch.pipeline().addLast(new ObjectEncoder());
+                    ch.pipeline().addLast(new ObjectDecoder(ClassResolvers.weakCachingConcurrentResolver(null)));
+                    ch.pipeline().addLast(new FileUploadClientHandler(fileUploadFile));
+                }
+            });
+            ChannelFuture f = b.connect(host, port).sync();
+            f.channel().closeFuture().sync();
+        } finally {
+            group.shutdownGracefully();
+        }
+    }
+
+    public void sendFileToServer(){
+        try {
+            FileUploadFile uploadFile = new FileUploadFile();
+            File file = new File("/sdcard/netty/test.jpg");
+            String fileMd5 = file.getName();// 文件名
+            uploadFile.setFile(file);
+            uploadFile.setFile_md5(fileMd5);
+            uploadFile.setStarPos(0);// 文件开始位置
+            connect(Const.TCP_PORT, Const.HOST, uploadFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**

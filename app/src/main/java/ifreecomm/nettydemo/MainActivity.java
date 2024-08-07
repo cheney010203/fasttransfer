@@ -4,14 +4,12 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
-import com.littlegreens.netty.client.listener.MessageStateListener;
+import com.geely.netty.nettycore.Const;
 import com.littlegreens.netty.client.listener.NettyClientListener;
 import com.littlegreens.netty.client.NettyTcpClient;
 import com.littlegreens.netty.client.status.ConnectState;
@@ -89,27 +87,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.send_btn:
-                if (!mNettyTcpClient.getConnectStatus()) {
-                    Toast.makeText(getApplicationContext(), "未连接,请先连接", Toast.LENGTH_SHORT).show();
-                } else {
-                    final String msg = mSendET.getText().toString();
-                    if (TextUtils.isEmpty(msg.trim())) {
-                        return;
-                    }
-                    mNettyTcpClient.sendMsgToServer(msg, new MessageStateListener() {
-                        @Override
-                        public void isSendSuccss(boolean isSuccess) {
-                            if (isSuccess) {
-                                Log.d(TAG, "Write auth successful");
-                                logSend(msg);
-                            } else {
-                                Log.d(TAG, "Write auth error");
-                            }
-                        }
-                    });
-                    mSendET.setText("");
-                }
-
+//                if (!mNettyTcpClient.getConnectStatus()) {
+//                    Toast.makeText(getApplicationContext(), "未连接,请先连接", Toast.LENGTH_SHORT).show();
+//                } else {
+//                    final String msg = mSendET.getText().toString();
+//                    if (TextUtils.isEmpty(msg.trim())) {
+//                        return;
+//                    }
+//                    mNettyTcpClient.sendMsgToServer(msg, new MessageStateListener() {
+//                        @Override
+//                        public void isSendSuccss(boolean isSuccess) {
+//                            if (isSuccess) {
+//                                Log.d(TAG, "Write auth successful");
+//                                logSend(msg);
+//                            } else {
+//                                Log.d(TAG, "Write auth error");
+//                            }
+//                        }
+//                    });
+//                    mSendET.setText("");
+//                }
+                //TODO: send file , by xujia
+                mNettyTcpClient.sendFileToServer();
                 break;
 
             case R.id.clear_log:
