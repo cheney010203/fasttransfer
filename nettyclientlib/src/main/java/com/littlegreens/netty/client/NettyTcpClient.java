@@ -131,20 +131,60 @@ public class NettyTcpClient {
         if (isConnecting) {
             return;
         }
-        Thread clientThread = new Thread("client-Netty") {
+        Thread clientStringThread = new Thread("client-Netty-String") {
             @Override
             public void run() {
                 super.run();
                 isNeedReconnect = true;
                 reconnectNum = MAX_CONNECT_TIMES;
-                connectServer();
+                connectStringServer();
             }
         };
-        clientThread.start();
+        clientStringThread.start();
+
+
+        Thread clientFileThread = new Thread("client-Netty-File") {
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    FileUploadFile uploadFile = new FileUploadFile();
+                    File file = new File("/sdcard/netty/test.jpg");
+                    String fileMd5 = file.getName();// 文件名
+                    uploadFile.setFile(file);
+                    uploadFile.setFile_md5(fileMd5);
+                    uploadFile.setStarPos(0);// 文件开始位置
+                    connectFileServerAndUpload(Const.TCP_FILE_PORT, Const.HOST, uploadFile);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        clientFileThread.start();
+    }
+
+    private void connectFileServerAndUpload(int port, String host, final FileUploadFile fileUploadFile) throws Exception {
+        EventLoopGroup group = new NioEventLoopGroup();
+        try {
+            Bootstrap b = new Bootstrap();
+            b.group(group).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, true).handler(new ChannelInitializer<Channel>() {
+
+                @Override
+                protected void initChannel(Channel ch) throws Exception {
+                    ch.pipeline().addLast(new ObjectEncoder());
+                    ch.pipeline().addLast(new ObjectDecoder(ClassResolvers.weakCachingConcurrentResolver(null)));
+                    ch.pipeline().addLast(new FileUploadClientHandler(fileUploadFile));
+                }
+            });
+            ChannelFuture f = b.connect(host, port).sync();
+            f.channel().closeFuture().sync();
+        } finally {
+            group.shutdownGracefully();
+        }
     }
 
 
-    private void connectServer() {
+    private void connectStringServer() {
         synchronized (NettyTcpClient.this) {
             ChannelFuture channelFuture = null;
             if (!isConnect) {
@@ -229,7 +269,7 @@ public class NettyTcpClient {
             SystemClock.sleep(reconnectIntervalTime);
             if (isNeedReconnect && reconnectNum > 0 && !isConnect) {
                 Log.e(TAG, "重新连接");
-                connectServer();
+                connectStringServer();
             }
         }
     }
@@ -293,40 +333,6 @@ public class NettyTcpClient {
             });
         }
         return flag;
-    }
-
-    private void connect(int port, String host, final FileUploadFile fileUploadFile) throws Exception {
-        EventLoopGroup group = new NioEventLoopGroup();
-        try {
-            Bootstrap b = new Bootstrap();
-            b.group(group).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, true).handler(new ChannelInitializer<Channel>() {
-
-                @Override
-                protected void initChannel(Channel ch) throws Exception {
-                    ch.pipeline().addLast(new ObjectEncoder());
-                    ch.pipeline().addLast(new ObjectDecoder(ClassResolvers.weakCachingConcurrentResolver(null)));
-                    ch.pipeline().addLast(new FileUploadClientHandler(fileUploadFile));
-                }
-            });
-            ChannelFuture f = b.connect(host, port).sync();
-            f.channel().closeFuture().sync();
-        } finally {
-            group.shutdownGracefully();
-        }
-    }
-
-    public void sendFileToServer(){
-        try {
-            FileUploadFile uploadFile = new FileUploadFile();
-            File file = new File("/sdcard/netty/test.jpg");
-            String fileMd5 = file.getName();// 文件名
-            uploadFile.setFile(file);
-            uploadFile.setFile_md5(fileMd5);
-            uploadFile.setStarPos(0);// 文件开始位置
-            connect(Const.TCP_PORT, Const.HOST, uploadFile);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     /**

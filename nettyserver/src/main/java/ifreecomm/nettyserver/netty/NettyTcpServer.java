@@ -3,6 +3,8 @@ package ifreecomm.nettyserver.netty;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.geely.netty.nettycore.Const;
+
 import java.net.InetSocketAddress;
 
 import io.netty.bootstrap.ServerBootstrap;
@@ -19,6 +21,9 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
@@ -31,7 +36,6 @@ import io.netty.util.CharsetUtil;
 public class NettyTcpServer {
 
     private static final String TAG = "NettyTcpServer";
-    private final int port = 1088;
     private Channel channel;
 
     private static NettyTcpServer instance = null;
@@ -78,7 +82,7 @@ public class NettyTcpServer {
                     ServerBootstrap b = new ServerBootstrap();
                     b.group(bossGroup, workerGroup)
                             .channel(NioServerSocketChannel.class) // 5
-                            .localAddress(new InetSocketAddress(port)) // 6
+                            .localAddress(new InetSocketAddress(Const.TCP_STRING_PORT)) // 6
                             .childOption(ChannelOption.SO_KEEPALIVE, true)
                             .childOption(ChannelOption.SO_REUSEADDR, true)
                             .childOption(ChannelOption.TCP_NODELAY, true)
@@ -120,6 +124,15 @@ public class NettyTcpServer {
                     bossGroup.shutdownGracefully();
                 }
             }
+        }.start();
+
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                FileUploadServer.receiverFile();
+            }
+
         }.start();
 
     }

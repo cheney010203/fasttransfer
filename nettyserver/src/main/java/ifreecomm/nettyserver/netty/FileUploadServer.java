@@ -39,7 +39,7 @@ public class FileUploadServer {
 
     public static void receiverFile(){
         try {
-            new FileUploadServer().bind(Const.TCP_PORT);
+            new FileUploadServer().bind(Const.TCP_FILE_PORT);
         } catch (Exception e) {
             e.printStackTrace();
         }

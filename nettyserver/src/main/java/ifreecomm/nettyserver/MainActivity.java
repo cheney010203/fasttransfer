@@ -111,11 +111,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
 
             case R.id.startServer:
-
-//                startServer();
-
-                //TODO: receive file , by xujia
-                FileUploadServer.receiverFile();
+                startServer();
                 break;
 
             case R.id.send_btn:
