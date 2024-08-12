@@ -129,13 +129,13 @@ public class NettyTcpServer {
 
     }
 
-    public void startFile(int port){
+    public void startFileServer(int port){
 
         new Thread(){
             @Override
             public void run() {
                 super.run();
-                FileUploadServer.receiverFile();
+                FileUploadServer.receiverFile(port);
             }
 
         }.start();

@@ -39,7 +39,7 @@ public class Server {
 
     public void startFileServer(int port){
         NettyTcpServer nettyTcpServer = NettyTcpServer.getInstance();
-        nettyTcpServer.startFile(port);
+        nettyTcpServer.startFileServer(port);
     }
 
     public class StringServerListener implements NettyServerListener<String> {

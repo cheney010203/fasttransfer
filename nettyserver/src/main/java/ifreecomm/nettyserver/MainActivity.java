@@ -115,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.startServer:
 //                startServer();
                 Server.getInstance().startStringServer(Const.TCP_STRING_PORT);
+                Server.getInstance().startFileServer(Const.TCP_FILE_PORT);
                 break;
 
             case R.id.send_btn:

@@ -126,6 +126,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                 });
+
+                //send file
+                Client.getInstance().sendFile("/sdcard/netty/test.jpg",Const.HOST,Const.TCP_FILE_PORT);
                 break;
 
             case R.id.clear_log:
