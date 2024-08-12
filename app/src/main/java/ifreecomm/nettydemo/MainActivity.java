@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.geely.netty.nettycore.Const;
+import com.littlegreens.netty.client.Client;
 import com.littlegreens.netty.client.listener.MessageStateListener;
 import com.littlegreens.netty.client.listener.NettyClientListener;
 import com.littlegreens.netty.client.NettyTcpClient;
@@ -41,20 +42,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViews();
         initView();
 
-        mNettyTcpClient = new NettyTcpClient.Builder()
-                .setHost(Const.HOST)    //设置服务端地址
-                .setTcpPort(Const.TCP_STRING_PORT) //设置服务端端口号
-                .setMaxReconnectTimes(5)    //设置最大重连次数
-                .setReconnectIntervalTime(5)    //设置重连间隔时间。单位：秒
-                .setSendheartBeat(true) //设置是否发送心跳
-                .setHeartBeatInterval(5)    //设置心跳间隔时间。单位：秒
-                .setHeartBeatData("I'm is HeartBeatData") //设置心跳数据，可以是String类型，也可以是byte[]，以后设置的为准
-                .setIndex(0)    //设置客户端标识.(因为可能存在多个tcp连接)
-//                .setPacketSeparator("#")//用特殊字符，作为分隔符，解决粘包问题，默认是用换行符作为分隔符
-//                .setMaxPacketLong(1024)//设置一次发送数据的最大长度，默认是1024
-                .build();
+//        mNettyTcpClient = new NettyTcpClient.Builder()
+//                .setHost(Const.HOST)    //设置服务端地址
+//                .setTcpPort(Const.TCP_STRING_PORT) //设置服务端端口号
+//                .setMaxReconnectTimes(5)    //设置最大重连次数
+//                .setReconnectIntervalTime(5)    //设置重连间隔时间。单位：秒
+//                .setSendheartBeat(true) //设置是否发送心跳
+//                .setHeartBeatInterval(5)    //设置心跳间隔时间。单位：秒
+//                .setHeartBeatData("I'm is HeartBeatData") //设置心跳数据，可以是String类型，也可以是byte[]，以后设置的为准
+//                .setIndex(0)    //设置客户端标识.(因为可能存在多个tcp连接)
+////                .setPacketSeparator("#")//用特殊字符，作为分隔符，解决粘包问题，默认是用换行符作为分隔符
+////                .setMaxPacketLong(1024)//设置一次发送数据的最大长度，默认是1024
+//                .build();
+//
+//        mNettyTcpClient.setListener(MainActivity.this); //设置TCP监听
 
-        mNettyTcpClient.setListener(MainActivity.this); //设置TCP监听
+        Client.getInstance().initStringConnect(Const.HOST,Const.TCP_STRING_PORT,MainActivity.this);
     }
 
     private void initView() {
@@ -86,30 +89,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
 
             case R.id.connect:
-                connect();
+//                connect();
                 break;
 
             case R.id.send_btn:
-                if (!mNettyTcpClient.getConnectStatus()) {
-                    Toast.makeText(getApplicationContext(), "未连接,请先连接", Toast.LENGTH_SHORT).show();
-                } else {
-                    final String msg = mSendET.getText().toString();
-                    if (TextUtils.isEmpty(msg.trim())) {
-                        return;
-                    }
-                    mNettyTcpClient.sendMsgToServer(msg, new MessageStateListener() {
-                        @Override
-                        public void isSendSuccss(boolean isSuccess) {
-                            if (isSuccess) {
-                                Log.d(TAG, "Write auth successful");
-                                logSend(msg);
-                            } else {
-                                Log.d(TAG, "Write auth error");
-                            }
+//                if (!mNettyTcpClient.getConnectStatus()) {
+//                    Toast.makeText(getApplicationContext(), "未连接,请先连接", Toast.LENGTH_SHORT).show();
+//                } else {
+//                    final String msg = mSendET.getText().toString();
+//                    if (TextUtils.isEmpty(msg.trim())) {
+//                        return;
+//                    }
+//                    mNettyTcpClient.sendMsgToServer(msg, new MessageStateListener() {
+//                        @Override
+//                        public void isSendSuccss(boolean isSuccess) {
+//                            if (isSuccess) {
+//                                Log.d(TAG, "Write auth successful");
+//                                logSend(msg);
+//                            } else {
+//                                Log.d(TAG, "Write auth error");
+//                            }
+//                        }
+//                    });
+
+//                    mSendET.setText("");
+//                }
+                final String msg = mSendET.getText().toString();
+                Client.getInstance().sendString(msg, new MessageStateListener() {
+                    @Override
+                    public void isSendSuccss(boolean isSuccess) {
+                        if (isSuccess) {
+                            Log.d(TAG, "Write auth successful");
+                            logSend(msg);
+                        } else {
+                            Log.d(TAG, "Write auth error");
                         }
-                    });
-                    mSendET.setText("");
-                }
+                    }
+                });
                 break;
 
             case R.id.clear_log:
@@ -121,14 +137,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void connect() {
-        Log.d(TAG, "connect");
-        if (!mNettyTcpClient.getConnectStatus()) {
-            mNettyTcpClient.connect();//连接服务器
-        } else {
-            mNettyTcpClient.disconnect();
-        }
-    }
+//    private void connect() {
+//        Log.d(TAG, "connect");
+//        if (!mNettyTcpClient.getConnectStatus()) {
+//            mNettyTcpClient.connect();//连接服务器
+//        } else {
+//            mNettyTcpClient.disconnect();
+//        }
+//    }
 
     @Override
     public void onMessageResponseClient(String msg, int index) {

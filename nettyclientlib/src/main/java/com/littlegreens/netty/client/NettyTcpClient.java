@@ -143,24 +143,24 @@ public class NettyTcpClient {
         clientStringThread.start();
 
 
-        Thread clientFileThread = new Thread("client-Netty-File") {
-            @Override
-            public void run() {
-                super.run();
-                try {
-                    FileUploadFile uploadFile = new FileUploadFile();
-                    File file = new File("/sdcard/netty/test.jpg");
-                    String fileMd5 = file.getName();// 文件名
-                    uploadFile.setFile(file);
-                    uploadFile.setFile_md5(fileMd5);
-                    uploadFile.setStarPos(0);// 文件开始位置
-                    connectFileServerAndUpload(Const.TCP_FILE_PORT, Const.HOST, uploadFile);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        clientFileThread.start();
+//        Thread clientFileThread = new Thread("client-Netty-File") {
+//            @Override
+//            public void run() {
+//                super.run();
+//                try {
+//                    FileUploadFile uploadFile = new FileUploadFile();
+//                    File file = new File("/sdcard/netty/test.jpg");
+//                    String fileMd5 = file.getName();// 文件名
+//                    uploadFile.setFile(file);
+//                    uploadFile.setFile_md5(fileMd5);
+//                    uploadFile.setStarPos(0);// 文件开始位置
+//                    connectFileServerAndUpload(Const.TCP_FILE_PORT, Const.HOST, uploadFile);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        };
+//        clientFileThread.start();
     }
 
     private void connectFileServerAndUpload(int port, String host, final FileUploadFile fileUploadFile) throws Exception {

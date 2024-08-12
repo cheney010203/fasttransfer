@@ -31,6 +31,8 @@ import io.netty.channel.ChannelFutureListener;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
+import com.geely.netty.nettycore.Const;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NettyServerListener<String> {
 
     private static final String TAG = "MainActivity";
@@ -111,7 +113,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
 
             case R.id.startServer:
-                startServer();
+//                startServer();
+                Server.getInstance().startStringServer(Const.TCP_STRING_PORT);
                 break;
 
             case R.id.send_btn:
@@ -122,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (TextUtils.isEmpty(msg.trim())) {
                         return;
                     }
-                    NettyTcpServer.getInstance().sendMsgToServer(msg, new ChannelFutureListener() {
+                    Server.getInstance().sendMsgToClient(msg, new ChannelFutureListener() {
                         @Override
                         public void operationComplete(ChannelFuture channelFuture) throws Exception {
                             if (channelFuture.isSuccess()) {                //4
@@ -146,17 +149,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void startServer() {
-        NettyTcpServer nettyTcpServer = NettyTcpServer.getInstance();
-//        nettyTcpServer.setPacketSeparator("#");
-        if (!nettyTcpServer.isServerStart()) {
-            nettyTcpServer.setListener(MainActivity.this);
-
-            nettyTcpServer.start();
-        } else {
-            NettyTcpServer.getInstance().disconnect();
-        }
-    }
+//    private void startServer() {
+//        NettyTcpServer nettyTcpServer = NettyTcpServer.getInstance();
+////        nettyTcpServer.setPacketSeparator("#");
+//        if (!nettyTcpServer.isServerStart()) {
+//            nettyTcpServer.setListener(MainActivity.this);
+//
+//            nettyTcpServer.start();
+//        } else {
+//            NettyTcpServer.getInstance().disconnect();
+//        }
+//    }
 
     @Override
     public void onMessageResponseServer(String msg, String uniqueId) {

@@ -71,7 +71,7 @@ public class NettyTcpServer {
     private NettyTcpServer() {
     }
 
-    public void start() {
+    public void start(int port) {
         new Thread() {
             @Override
             public void run() {
@@ -82,7 +82,7 @@ public class NettyTcpServer {
                     ServerBootstrap b = new ServerBootstrap();
                     b.group(bossGroup, workerGroup)
                             .channel(NioServerSocketChannel.class) // 5
-                            .localAddress(new InetSocketAddress(Const.TCP_STRING_PORT)) // 6
+                            .localAddress(new InetSocketAddress(port)) // 6
                             .childOption(ChannelOption.SO_KEEPALIVE, true)
                             .childOption(ChannelOption.SO_REUSEADDR, true)
                             .childOption(ChannelOption.TCP_NODELAY, true)
@@ -126,6 +126,11 @@ public class NettyTcpServer {
             }
         }.start();
 
+
+    }
+
+    public void startFile(int port){
+
         new Thread(){
             @Override
             public void run() {
@@ -134,7 +139,6 @@ public class NettyTcpServer {
             }
 
         }.start();
-
     }
 
     public void disconnect() {
